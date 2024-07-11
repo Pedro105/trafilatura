@@ -100,6 +100,16 @@ def probe_alternative_homepage(
     return new_htmlstring, new_homepage, base_url
 
 
+branch_coverage_links = {
+    "language_check": False,
+    "language_mismatch": False,
+    "language_match": False,
+    "robot_check": False,
+    "not_crawlable": False,
+    "is_navigation": False,
+    "normal_link": False,
+}
+
 def process_links(
     htmlstring: str,
     url: Optional[str] = "",
@@ -111,10 +121,14 @@ def process_links(
     Store the links in todo-list while prioritizing the navigation ones."""
     # optional language check: run baseline extraction + language identifier
     if language and LANGID_FLAG and htmlstring:
+        branch_coverage_links["language_check"] = True
         _, text, _ = baseline(htmlstring)
         result, _ = py3langid.classify(text)
         if result != language:
+            branch_coverage_links["language_mismatch"] = True
             return
+        else:
+            branch_coverage_links["language_match"] = True
 
     # iterate through the links and filter them
     links, links_priority = [], []
@@ -127,15 +141,28 @@ def process_links(
     ):
         # check robots.txt rules + sanity check
         if (rules and not rules.can_fetch("*", link)) or is_not_crawlable(link):
+            branch_coverage_links["robot_check"] = True
+            if is_not_crawlable(link):
+                branch_coverage_links["not_crawlable"] = True
             continue
+
         # store
         if is_navigation_page(link):
+            branch_coverage_links["is_navigation"] = True
             links_priority.append(link)
         else:
+            branch_coverage_links["normal_link"] = True
             links.append(link)
 
     URL_STORE.add_urls(urls=links, appendleft=links_priority)
 
+def get_branch_coverage_links():
+    return branch_coverage_links
+
+branch_coverage_response = {
+    "response_not_none": False,
+    "response_data": False,
+}
 
 def process_response(
     response: Any,
@@ -146,13 +173,17 @@ def process_response(
     """Convert urllib3 response object and extract links."""
     # add final document URL to known_links
     if response is not None:
+        branch_coverage_response["response_not_none"] = True
         URL_STORE.add_urls([response.url], visited=True)
         if response.data:
+            branch_coverage_response["response_data"] = True
             # convert urllib3 response to string
             htmlstring = decode_file(response.data)
             # proceed to link extraction
             process_links(htmlstring, base_url, language=language, rules=rules)
 
+def get_branch_coverage_response():
+    return branch_coverage_response
 
 def parse_robots(robots_url: str, data: str) -> Optional[RobotFileParser]:
     "Parse a robots.txt file with the standard library urllib.robotparser."
@@ -244,6 +275,14 @@ def crawl_page(
     return is_on, known_num, visited_num
 
 
+
+# Initialize coverage tracking for focused_crawler
+branch_coverage = {
+    "loop_entered": False,
+    "max_seen_urls_reached": False,
+    "max_known_urls_exceeded": False,
+}
+
 def focused_crawler(
     homepage: str,
     max_seen_urls: int = MAX_SEEN_URLS,
@@ -254,23 +293,6 @@ def focused_crawler(
     config: Any = DEFAULT_CONFIG,
     rules: Optional[RobotFileParser] = None,
 ) -> Tuple[List[str], List[str]]:
-    """Basic crawler targeting pages of interest within a website.
-
-    Args:
-        homepage: URL of the page to first page to fetch, preferably the homepage of a website.
-        max_seen_urls: maximum number of pages to visit, stop iterations at this number or at the exhaustion of pages on the website, whichever comes first.
-        max_known_urls: stop if the total number of pages "known" exceeds this number.
-        todo: provide a previously generated list of pages to visit / crawl frontier.
-        known_links: provide a list of previously known pages.
-        lang: try to target links according to language heuristics.
-        config: use a different configuration (configparser format).
-        rules: provide politeness rules (urllib.robotparser.RobotFileParser() format).
-
-    Returns:
-        List of pages to visit, deque format, possibly empty if there are no further pages to visit.
-        Set of known links.
-
-    """
     base_url, i, known_num, rules, is_on = init_crawl(
         homepage, todo, known_links, language=lang, rules=rules
     )
@@ -280,14 +302,21 @@ def focused_crawler(
 
     # visit pages until a limit is reached
     while is_on and i < max_seen_urls and known_num <= max_known_urls:
+        branch_coverage["loop_entered"] = True
         is_on, known_num, i = crawl_page(i, base_url, lang=lang, rules=rules)
         sleep(sleep_time)
+        if i >= max_seen_urls:
+            branch_coverage["max_seen_urls_reached"] = True
+        if known_num > max_known_urls:
+            branch_coverage["max_known_urls_exceeded"] = True
 
-    # refocus todo-list on URLs without navigation?
     todo = list(dict.fromkeys(URL_STORE.find_unvisited_urls(base_url)))
-    # [u for u in todo if not is_navigation_page(u)]
     known_links = list(dict.fromkeys(URL_STORE.find_known_urls(base_url)))
     return todo, known_links
+
+def print_coverage():
+    for branch, hit in branch_coverage.items():
+        print(f"{branch} was {'hit' if hit else 'not hit'}")
 
 
 def is_still_navigation(todo: List[str]) -> bool:
