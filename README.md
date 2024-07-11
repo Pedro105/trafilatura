@@ -31,6 +31,8 @@ Cmd used: "coverage run --branch spider_tests.py && coverage html"
 
 <Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced tests for function 1>
 
+https://github.com/Pedro105/trafilatura/commit/3983ad6b02f358f82673acfe8f3d465ecd134e27
+
 <Provide a screenshot of the old coverage results for such function>
 
 ![Screenshot 2024-07-11 at 20 44 16](https://github.com/Pedro105/trafilatura/assets/41062943/556bfe58-2aeb-45f1-b964-fa1fdcc69677)
@@ -46,6 +48,8 @@ Coverage 78% -> 91%
 <focused_crawler>
 
 <Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced tests for function 1>
+
+https://github.com/Pedro105/trafilatura/commit/3983ad6b02f358f82673acfe8f3d465ecd134e27
 
 <Provide a screenshot of the old coverage results for such function>
     
