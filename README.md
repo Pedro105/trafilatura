@@ -1,13 +1,3 @@
-I have modififed the spider.py file within the trafilatura folder and the spider_tests.py file in the tests folder.
-
-My functions were the:
-
-    process_response()
-    focused_crawler()
-
-functions.
-
-T
 
 # Report for Assignment 1 resit
 
@@ -17,7 +7,13 @@ Name: <Trafilatura>
 
 URL: <https://github.com/adbar/trafilatura>
 
-Number of lines of code and the tool used to count it: <TODO>
+Number of lines of code and the tool used to count it: 
+
+26320
+
+tool: Find and wc command unix:
+
+find . -name '*.py' | xargs wc -l
 
 Programming language: <Python>
 
@@ -72,3 +68,8 @@ Coverage 70% -> 79%
 ## Coverage improvement
 
 ![Screenshot 2024-07-11 at 20 13 08](https://github.com/Pedro105/trafilatura/assets/41062943/bd5e48d2-ce20-4435-add1-703c165ee44e)
+
+
+## Footnote:
+
+I initially attempted to modify the process_links function but ran into issues and decided to switch to focused_crawler.
