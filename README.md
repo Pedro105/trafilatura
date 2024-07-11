@@ -26,9 +26,14 @@ Programming language: <TODO>
 Coverage Python tool was used:
 Cmd used: "coverage run --branch spider_tests.py && coverage html"
 
-<Show the coverage results provided by the existing tool with a screenshot>
+##Original Coverage
+
+![Screenshot 2024-07-11 at 19 33 26](https://github.com/Pedro105/trafilatura/assets/41062943/984ed248-f257-478e-8464-94f0532ac76d)
 
 ## Coverage improvement
+
+![Screenshot 2024-07-11 at 20 13 08](https://github.com/Pedro105/trafilatura/assets/41062943/bd5e48d2-ce20-4435-add1-703c165ee44e)
+
 
 ### Individual tests
 
